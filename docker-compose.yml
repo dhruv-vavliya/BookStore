@@ -1,0 +1,54 @@
+version: '3'
+services:
+
+  bookstore-server:
+    container_name: bookstore-server
+    build: .
+    ports: 
+      - 80:8080
+    restart: on-failure
+    volumes:
+      - api:/usr/src/app/
+    depends_on:
+      - postgres          
+    networks:
+      - bookstore
+
+
+  postgres:
+    image: postgres:latest
+    container_name: bookstore-db
+    environment:
+      - POSTGRES_USER=${DB_USER}  
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - DATABASE_HOST=${DB_HOST} 
+    ports:
+      - '5432:5432'
+    volumes:
+      - database_postgres:/var/lib/postgresql/data
+    networks:
+      - bookstore
+    
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_container
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    depends_on:
+      - postgres
+    ports:
+      - "5050:5050"
+    networks:
+      - bookstore
+    restart: unless-stopped
+
+volumes:
+  api:
+  database_postgres:                  
+
+# Networks to be created to facilitate communication between containers
+networks:
+  bookstore:
+    driver: bridge
