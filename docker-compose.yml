@@ -16,37 +16,38 @@ services:
 
 
   postgres:
-    image: postgres:latest
+    image: postgres
     container_name: bookstore-db
     environment:
-      - POSTGRES_USER=${DB_USER}  
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
-      - DATABASE_HOST=${DB_HOST} 
+      POSTGRES_USER: ${DB_USER}  
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      DATABASE_HOST: ${DB_PORT}
+      PGDATA: /data/postgres
     ports:
-      - '5432:5432'
+      - '5435:5432'
     volumes:
-      - database_postgres:/var/lib/postgresql/data
+      - postgres:/data/postgres
     networks:
       - bookstore
     
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin_container
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-    depends_on:
-      - postgres
-    ports:
-      - "5050:5050"
-    networks:
-      - bookstore
-    restart: unless-stopped
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   container_name: pgadmin_container
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+  #   depends_on:
+  #     - postgres
+  #   ports:
+  #     - "5050:5050"
+  #   networks:
+  #     - bookstore
+  #   restart: unless-stopped
 
 volumes:
   api:
-  database_postgres:                  
+  postgres:                  
 
 # Networks to be created to facilitate communication between containers
 networks:
