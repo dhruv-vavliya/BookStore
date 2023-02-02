@@ -6,30 +6,26 @@ import (
 	"log"
 
 	"github.com/dhruv-vavliya/BookStore/ent"
-	"github.com/dhruv-vavliya/BookStore/ent/author"
-	"github.com/dhruv-vavliya/BookStore/ent/book"
 	"github.com/dhruv-vavliya/BookStore/models"
+	"github.com/dhruv-vavliya/BookStore/repos"
 )
 
 func GetAllBooks(ctx context.Context, client *ent.Client) ([]*ent.Book, error) {
-	books, err := client.Book.Query().All(ctx)
+	books, err := repo.GetBooks(client, ctx)
 	if err != nil {
 		return nil, fmt.Errorf("Failed Registering Book: %w", err)
 	}
-
 	return books, nil
 }
 
 func GetBooksByAuthorName(ctx context.Context, client *ent.Client, authorName string) ([]*ent.Book, error) {
 	
-	author, err := client.Author.Query().Where(
-		author.Name(authorName),
-	).First(ctx)
+	author, err := repo.GetAuthorByAuthorName(client, authorName, ctx)
 	if err != nil {
 		return nil, fmt.Errorf("Author Doesn't Exist: %w", err)
 	}
 
-	books, err := author.QueryBooks().All(ctx)
+	books, err := repo.GetBooksByAuthor(author, ctx)
 	if err != nil {
 		return nil, fmt.Errorf("Failed Registering Book: %w", err)
 	}
@@ -37,13 +33,8 @@ func GetBooksByAuthorName(ctx context.Context, client *ent.Client, authorName st
 	return books, nil
 }
 
-func CreateBook(ctx context.Context, client *ent.Client, params *models.Book, user *ent.Author) (*ent.Book, error) {
-	book, err := client.Book.Create().
-		SetName(params.Name).
-		SetPrice(params.Price).
-		SetAuthor(user).
-		Save(ctx)						// save to DB & return to HTTP response.
-	
+func CreateBook(ctx context.Context, client *ent.Client, params *models.Book, author *ent.Author) (*ent.Book, error) {
+	book, err := repo.CreateBook(client, params, author, ctx)
 	if err != nil {
 		return nil, fmt.Errorf("Failed Registering Book: %w", err)
 	}
@@ -54,11 +45,7 @@ func CreateBook(ctx context.Context, client *ent.Client, params *models.Book, us
 
 
 func DeleteBookByID(ctx context.Context, client *ent.Client, bookID int) (error) {
-	affected, err := client.Book.Delete().
-		Where(
-			book.ID(bookID),
-		).Exec(ctx)
-	
+	affected, err := repo.DeleteBook(client, bookID, ctx)
 	if err != nil {
 		return fmt.Errorf("Failed Deleting Book: %w", err)
 	}
@@ -72,14 +59,7 @@ func DeleteBookByID(ctx context.Context, client *ent.Client, bookID int) (error)
 
 
 func UpdateBookByID(ctx context.Context, client *ent.Client, bookID int, params *models.Book) (error) {
-	affected, err := client.Book.Update().
-		Where(
-			book.ID(bookID),
-		).
-		SetName(params.Name).
-		SetPrice(params.Price).
-		Save(ctx)
-	
+	affected, err := repo.UpdateBook(client, bookID, params, ctx)
 	if err != nil {
 		return fmt.Errorf("Failed Deleting Book: %w", err)
 	}

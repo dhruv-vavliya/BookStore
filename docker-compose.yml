@@ -1,53 +1,43 @@
-version: '3'
+version: '3.9'
 services:
 
   bookstore-server:
+    build: 
+      dockerfile: Dockerfile
+      context: .
+    image: bookstore:latest
     container_name: bookstore-server
-    build: .
     ports: 
-      - 80:8080
+      - 80:80
     restart: on-failure
     volumes:
-      - api:/usr/src/app/
+      - api:/usr/src/app
     depends_on:
       - postgres          
     networks:
       - bookstore
 
-
+  # DB working at 5432( in host/container ) & map to(expose to) at 5435.
   postgres:
-    image: postgres
+    image: postgres:alpine
     container_name: bookstore-db
     environment:
       POSTGRES_USER: ${DB_USER}  
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
-      DATABASE_HOST: ${DB_PORT}
       PGDATA: /data/postgres
     ports:
-      - '5435:5432'
+      - 5435:5432
     volumes:
       - postgres:/data/postgres
     networks:
       - bookstore
-    
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   container_name: pgadmin_container
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-  #   depends_on:
-  #     - postgres
-  #   ports:
-  #     - "5050:5050"
-  #   networks:
-  #     - bookstore
-  #   restart: unless-stopped
 
 volumes:
   api:
-  postgres:                  
+  postgres:
+  web-root:
+    driver: local                  
 
 # Networks to be created to facilitate communication between containers
 networks:

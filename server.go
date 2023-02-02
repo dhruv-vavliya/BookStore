@@ -13,18 +13,18 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func HomeHandler(w http.ResponseWriter, r *http.Request){
+func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("<h1>Welcome to Bookstore</h1>"))
 }
 
-// Router -> routes -> controllers -> services -> modelling -> database
+// Router -> routes -> controllers -> services -> repos -> modelling -> database
 func main() {
 
 	// Database connection
 	client, err := configs.Connect()
 	if err != nil {
 		log.Fatal("Database Connection Failed.")
-	}	
+	}
 	controllers.EntClient = client
 	middlewares.EntClient = client
 
@@ -40,11 +40,11 @@ func main() {
 	// Server Setup
 	srv := &http.Server{
 		Handler:      r,
-		Addr:         "localhost:" + os.Getenv("PORT"),
+		Addr:         os.Getenv("HOST_ADDR"),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
 
-	log.Printf("Server Port: %s",os.Getenv("PORT"))
+	log.Printf("Server Port: %s", os.Getenv("PORT"))
 	log.Fatal(srv.ListenAndServe())
 }

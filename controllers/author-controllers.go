@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -24,6 +25,7 @@ func SignUp(w http.ResponseWriter, r *http.Request){
 		} )
 		return
 	}
+	fmt.Print(params)
 
 	user, err := services.RegisterAuthor(r.Context(), EntClient, &params )
 	if err != nil {

@@ -6,8 +6,8 @@ import (
 	"log"
 
 	"github.com/dhruv-vavliya/BookStore/ent"
-	"github.com/dhruv-vavliya/BookStore/ent/author"
 	"github.com/dhruv-vavliya/BookStore/models"
+	"github.com/dhruv-vavliya/BookStore/repos"
 	"github.com/dhruv-vavliya/BookStore/utils"
 )
 
@@ -15,28 +15,20 @@ import (
 func RegisterAuthor(ctx context.Context, client *ent.Client, params *models.Author ) (*ent.Author, error) {
 	
 	hashedPassword, _ := utils.HashPassword(params.Password)
-	user, err := client.Author.Create().
-		SetEmail(params.Email).
-		SetName(params.Name).
-		SetPassword(hashedPassword).
-		Save(ctx)						// save to DB & return to HTTP response.
-	
+	author, err := repo.CreateAuthor(client, params, hashedPassword, ctx)
+
 	if err != nil {
 		return nil, fmt.Errorf("Failed Registering Author: %w", err)
 	}
 	log.Println("Author Created Successfully.")
 
-	return user, nil
+	return author, nil
 }
 
 func ValidateAuthor(ctx context.Context, client *ent.Client, params *models.Credentials ) (int, error) {
 	
 	// validate user
-	author, err := client.Author.Query().
-	Where(
-		author.Email(params.Email),
-	).
-	Only(ctx)
+	author, err := repo.GetAuthorByEmail(client, params, ctx)
 	if err != nil {
 		return -1, err
 	}
@@ -51,11 +43,7 @@ func ValidateAuthor(ctx context.Context, client *ent.Client, params *models.Cred
 
 
 func DeleteAuthorByID(ctx context.Context, client *ent.Client, authorID int) (error) {
-	affected, err := client.Author.Delete().
-		Where(
-			author.ID(authorID),
-		).Exec(ctx)
-		
+	affected, err := repo.DeleteAuthor(client, authorID, ctx)
 	if err != nil {
 		return fmt.Errorf("Failed Deleting Author: %w", err)
 	}
