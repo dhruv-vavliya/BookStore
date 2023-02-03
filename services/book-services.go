@@ -44,8 +44,8 @@ func CreateBook(ctx context.Context, client *ent.Client, params *models.Book, au
 }
 
 
-func DeleteBookByID(ctx context.Context, client *ent.Client, bookID int) (error) {
-	affected, err := repo.DeleteBook(client, bookID, ctx)
+func DeleteBookByID(ctx context.Context, client *ent.Client) (error) {
+	affected, err := repo.DeleteBook(client, ctx)
 	if err != nil {
 		return fmt.Errorf("Failed Deleting Book: %w", err)
 	}

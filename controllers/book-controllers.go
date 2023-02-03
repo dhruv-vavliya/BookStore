@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -41,8 +42,11 @@ func AddBook(w http.ResponseWriter, r *http.Request) {
 func DeleteBook(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	bookID, _ := strconv.Atoi(params["id"])
+	
+	ctx := r.Context()
+	context.WithValue(ctx, "bookID", bookID)
 
-	err := services.DeleteBookByID(r.Context(), EntClient, bookID)
+	err := services.DeleteBookByID(ctx, EntClient)
 	if err != nil {
 		json.NewEncoder(w).Encode(models.ResponseError{
 			Status: http.StatusBadRequest,
