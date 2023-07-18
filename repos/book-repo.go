@@ -2,8 +2,6 @@ package repo
 
 import (
 	"context"
-	"fmt"
-	// "strconv"
 
 	"github.com/dhruv-vavliya/BookStore/ent"
 	"github.com/dhruv-vavliya/BookStore/ent/book"
@@ -25,11 +23,9 @@ func CreateBook(client *ent.Client, params *models.Book, author *ent.Author, ctx
 }
 
 func DeleteBook(client *ent.Client, ctx context.Context) (int, error) {
-	// bookID, _ := strconv.Atoi("bookID")
-	fmt.Print(ctx)
 	return client.Book.Delete().
 		Where(
-			book.ID(1),
+			book.ID(ctx.Value("bookID").(int)),
 		).
 		Exec(ctx)
 }

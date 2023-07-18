@@ -8,7 +8,7 @@ import (
 	"github.com/dhruv-vavliya/BookStore/models"
 )
 
-type AuthorAccess interface{
+type BookAccess interface{
 	CreateAuthor(client *ent.Client, params *models.Author, hashedPassword string, ctx context.Context) (*ent.Author, error)
 	GetAuthorByEmail(client *ent.Client, params *models.Credentials, ctx context.Context) (*ent.Author, error)
 	DeleteAuthor(client *ent.Client, authorID int, ctx context.Context) (int, error)

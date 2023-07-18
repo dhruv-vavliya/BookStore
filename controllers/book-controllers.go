@@ -44,7 +44,7 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 	bookID, _ := strconv.Atoi(params["id"])
 	
 	ctx := r.Context()
-	context.WithValue(ctx, "bookID", bookID)
+	ctx = context.WithValue(ctx, "bookID", bookID)
 
 	err := services.DeleteBookByID(ctx, EntClient)
 	if err != nil {
